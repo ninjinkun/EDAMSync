@@ -1,0 +1,54 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>[% title || 'EDAMSync' %]</title>
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <meta http-equiv="Content-Script-Type" content="text/javascript" />
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0" />
+    <meta name="format-detection" content="telephone=no" />
+        <script src="[% uri_for('/static/js/jquery-1.8.0.min.js') %]"></script>
+    <link href="[% uri_for('/static/bootstrap/bootstrap.css') %]" rel="stylesheet" type="text/css" />
+    <script src="[% uri_for('/static/bootstrap/bootstrap-dropdown.js') %]"></script>
+
+    <script src="[% uri_for('/static/js/es5-shim.min.js') %]"></script>
+
+    <script src="[% uri_for('/static/js/micro_template.js') %]"></script>
+
+    <script src="[% uri_for('/static/js/strftime.js') %]"></script>
+
+    <script src="[% uri_for('/static/js/sprintf-0.7-beta1.js') %]"></script>
+
+
+    <link href="[% static_file('/static/css/main.css') %]" rel="stylesheet" type="text/css" media="screen" />
+    <script src="[% static_file('/static/js/main.js') %]"></script>
+    <!--[if lt IE 9]>
+        <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+</head>
+<body[% IF bodyID %] id="[% bodyID %]"[% END %]>
+    <div class="navbar navbar-fixed-top">
+        <div class="navbar-inner">
+            <div class="container">
+                <a class="brand" href="#">EDAMSync</a>
+                <div class="nav-collapse">
+                    <ul class="nav">
+                        <li class="active"><a href="#">Home</a></li>
+                        <li><a href="#">Link</a></li>
+                        <li><a href="#">Link</a></li>
+                        <li><a href="#">Link</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div><!-- /.navbar-inner -->
+    </div><!-- /.navbar -->
+    <div class="container">
+        <div id="main">
+            [% content %]
+        </div>
+        <footer class="footer">
+            Powered by <a href="http://amon.64p.org/">Amon2</a>
+        </footer>
+    </div>
+</body>
+</html>
