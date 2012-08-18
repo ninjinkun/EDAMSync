@@ -9,7 +9,6 @@ use SQL::Interp qw(sql_interp);;
 use DateTime;
 use DateTime::Format::MySQL;
 use Data::UUID;
-use MIME::Base64;
 
 my $server_host = $ENV{SERVER_HOST} || 'localhost:5000';
 my $client_name = $ENV{EDAM_ENV} || 'client';
@@ -36,8 +35,8 @@ sub sync {
     my $last_sync_time = $client_status->{last_sync_time} ? DateTime::Format::MySQL->parse_datetime($client_status->{last_sync_time}) : undef;
     my $last_update_count = $client_status->{last_update_count} || 0;
 
-    warn $full_sync_before;
-    warn $last_sync_time;
+    warn $full_sync_before . 'full sync before';
+    warn $last_sync_time . 'last sync time';
     if ((!defined $last_sync_time) ||  $full_sync_before > $last_sync_time) {
         ## full_sync
         my $will_sync_entries = $class->_sync($c);
@@ -49,14 +48,14 @@ sub sync {
         );
         return $c->create_response(200, [], encode_json({
             synced_entries => $will_sync_entries,
-             type => 'full sync',
+            type => 'full sync',
         }));
         # return $c->render_json({
         #     synced_entries => $will_sync_entries,
         #     type => 'full sync',
         # });
     }
-    elsif ($full_sync_before == $last_sync_time) {
+    elsif (defined $full_sync_before && defined $last_sync_time && $full_sync_before == $last_sync_time) {
         my $client_entries = $c->dbh->selectall_arrayref(
             q{SELECT * FROM entry WHERE dirty = 1},
             {
@@ -68,7 +67,6 @@ sub sync {
             last_update_count => $last_update_count,
             server_update_count => $server_update_count,
         );
-        warn $c->encoding;
         return $c->create_response(200, [], encode_json({
             synced_entries => $client_entries,
             type => 'send changes',
@@ -104,8 +102,7 @@ sub sync {
     }
     
 }
-;
-use XXX;
+
 sub _sync {
     my ($class, $c, %args) = @_;
     my $after_usn = $args{after_usn};
@@ -116,8 +113,8 @@ sub _sync {
     ## full sync
     my $res = $ua->get($uri);
     my $json = decode_json $res->content;
-    warn $after_usn;
-    YYY my $server_entries = $json->{entries};
+    warn 'after usn!! ' . $after_usn;
+    my $server_entries = $json->{entries};
     my @server_uuids = map { $_->{uuid} } @$server_entries;
     my ($sql, @bind) = sql_interp(q{SELECT * FROM entry WHERE uuid IN}, \@server_uuids, q{or dirty = 1});
     my $client_entries = $c->dbh->selectall_arrayref(
@@ -183,9 +180,9 @@ sub _send_changes {
     my ($class, $c, %args) = @_;
     my $will_sync_entries = $args{will_sync_entries};
     my $last_update_count = $args{last_update_count};
-    my $server_update_count = $args{server_update_count};
     my $txn = $c->dbh->txn_scope;
     my $server_current_time;
+    my $server_update_count;
     ## send changes
     {
         my $ua = LWP::UserAgent->new;
@@ -196,6 +193,7 @@ sub _send_changes {
         ]);
         my $json = decode_json($res->content);
         $server_current_time = DateTime->from_epoch(epoch => $json->{server_current_time});
+        $server_update_count = $json->{server_update_count};
         my $entries = $json->{entries};
         for my $entry (@$entries) {
             if ($entry->{usn} == $last_update_count + 1) {

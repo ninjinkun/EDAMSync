@@ -13,7 +13,7 @@ my $client_name = $ENV{EDAM_ENV} || 'client';
 get '/' => sub {
     my ($c) = @_;
     my $entries = $c->dbh->selectall_arrayref(
-        q{select * from entry},
+        q{select * from entry ORDER BY usn},
         {
             Slice => {}},
     );
@@ -25,8 +25,8 @@ get '/' => sub {
         $client_name,
     );
 
-
     $c->render('index.tt' => {
+        client_name => $client_name,
         entries => $entries,
         client_status => $client_status,
     });
@@ -65,7 +65,10 @@ get '/entry/:entry_id' => sub {
         },
         $entry_id,
     );
-    $c->render('entry.tt' => { entry => $entry })
+    $c->render('entry.tt' => {
+        client_name => $client_name,
+        entry => $entry
+    })
 };
 
 post '/entry/:entry_id' => sub {

@@ -30,7 +30,7 @@
     <div class="navbar navbar-fixed-top">
         <div class="navbar-inner">
             <div class="container">
-                <a class="brand" href="#">EDAMSync</a>
+                <a class="brand" href="#" style="background-color: [% client_name == 'client' ? 'red' : 'blue' %]">EDAMSync</a>
                 <div class="nav-collapse">
                     <ul class="nav">
                         <li class="active"><a href="/">Home</a></li>

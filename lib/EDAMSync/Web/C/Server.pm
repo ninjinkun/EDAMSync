@@ -78,7 +78,7 @@ sub sync {
     my @conflicted_entries;
     my @client_uuids = map { $_->{uuid} } @$entries;
     my $now = DateTime->now;
-
+    my $update_count;
     my ($sql, @bind) = sql_interp(q{SELECT * FROM entry WHERE uuid IN}, \@client_uuids);
     my $server_entries = $c->dbh->selectall_arrayref(
         $sql,
@@ -96,7 +96,7 @@ sub sync {
             {
             },
         );
-        my $update_count = $update_count_row->{update_count};
+        $update_count = $update_count_row->{update_count};
         for my $client_entry (@$entries) {
             warn 'obj';
             all { defined $client_entry->{$_} }qw/body uuid usn/ or return $c->create_response(400, [], "parameter missing");
@@ -171,7 +171,7 @@ sub sync {
                     full_sync_before => DateTime::Format::MySQL->format_datetime($now),
                 },
                 q{WHERE}, +{
-                    client_name => 'cleint',
+                    client_name => 'client',
                 },
             );
         }
@@ -189,6 +189,7 @@ sub sync {
         entries => \@created_entries || [],
         conflicted_entries => \@conflicted_entries || [],
         server_current_time => $now->epoch,
+        server_update_count => $update_count,
     }));
 };
 
