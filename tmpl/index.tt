@@ -1,79 +1,46 @@
 [% WRAPPER 'include/layout.tt' %]
 
-<h1 style="text-align: center">Hello, Amon2 world!</h1>
+<form method="post" action="[% uri_for('/create') %]">
+    <textarea name="body" rows="4" cols="40"></textarea>
+    <input type="submit" value="追加" />
+</form>
 
-<div class="row">
-    <div class="span6">
-        <h2>For benchmarkers...</h2>
-        <p>If you want to benchmarking between Plack based web application frameworks, you should use <B>Amon2::Setup::Flavor::Minimum</B> instead.</p>
-        <p>You can use it as following one liner:</p>
-        <pre>% amon2-setup.pl --flavor Minimum Foo</pre>
-    </div>
-    <div class="span6">
-        <p>Amon2 is right for you if ...</p>
-        <ul>
-        <li>You need exceptional performance.</li>
-        <li>You want a framework with a small footprint.</li>
-        <li>You want a framework that requires nearly zero configuration.</li>
-        </ul>
-    </div>
+<h3>Data</h3>
+
+<ul>
+[% FOR entry IN entries %]
+    <li>
+    <a href="[% uri_for('/entry/' _ entry.uuid) %]">[% entry.body %]</a>
+      <ul>
+        <li>UUID: [% entry.uuid %]</li>
+        <li>USN: [% entry.usn %]</li>
+        <li>dirty: [% entry.dirty %]</li>
+      </ul>
+  </li>
+[% END %]
+</ul>
+
+[% IF client_status %]
+<h3>Client Status</h3>
+<ul>
+<li>Last Update Count: [% client_status.last_update_count %]</li>
+<li>Last Sync Time:    [% client_status.last_sync_time %]</li>
+</ul>
+[% END %]
+
+
+<button type="button" id="sync">同期</button>
+<div id="sync-result">
 </div>
 
-<hr />
-
-<style>
-    .marketing .row {
-        margin-top: 20px;
-    }
-</style>
-<div class="marketing">
-    <h1 style="text-align: center; font-size: 280%;">Battery Included?</h1>
-
-    <div class="row">
-        <div class="span4">
-            <h2>CSS Library</h2>
-            <div>
-                Current version of Amon2 using twitter's bootstrap.css as a default CSS library.<br />
-                If you want to learn it, please access to <a href="http://twitter.github.com/bootstrap/">twitter.github.com/bootstrap/</a>
-            </div>
-        </div>
-
-        <div class="span4">
-            <h2>JS Library</h2>
-            <div>
-                <a href="http://jquery.com/">jQuery</a> included.
-            </div>
-        </div>
-
-        <div class="span4">
-            <h2>Template Engine</h2>
-            <div>
-                Amon2 uses <B>Text::Xslate</B>(TTerse) as a primary template engine.<br />
-                But you can use any template engine easily.
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="span4">
-            <h2>O/R Mapper?</h2>
-            <div>
-                There is no O/R Mapper support. But I recommend to use Teng.<br />
-                You can integrate Teng very easily.<br />
-                See <a href="http://amon.64p.org/database.html#teng">This page</a> for more details.
-            </div>
-        </div>
-    </div>
-</div>
-
-<hr />
-
-<section class="row">
-    <div class="span12">
-        <h1>Documents?</h1>
-        <p>Complete docs are available on <a href="http://amon.64p.org/">amon.64p.org</a></p>
-        <p>And there is module specific docs on <a href="https://metacpan.org/release/Amon2">CPAN</a></p>
-    </div>
-</section>
+<script type="text/javascript">
+$('#sync').click(function() {
+  $.post('/client/api/sync', function(data) {
+    console.log(data);
+    $('#sync-result').html(JSON.stringify(data));
+  });
+});
+</script>
 
 [% END %]
+

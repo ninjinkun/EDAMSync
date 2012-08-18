@@ -1,0 +1,11 @@
+[% WRAPPER 'include/layout.tt' %]
+<form method="post" action="[% uri_for('/entry/' _ entry.uuid) %]">
+    <textarea name="body" rows="4" cols="40">[% entry.body %]</textarea>
+    <input type="submit" value="編集" />
+    <input type="hidden" name="usn" value="[% entry.usn %]" />
+</form>
+<form method="post" action="[% uri_for('/entry/' _ entry.uuid) _ '/delete' %]">
+    <input type="submit" value="削除">
+</form>
+
+[% END %]

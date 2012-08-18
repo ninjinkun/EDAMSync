@@ -33,10 +33,7 @@
                 <a class="brand" href="#">EDAMSync</a>
                 <div class="nav-collapse">
                     <ul class="nav">
-                        <li class="active"><a href="#">Home</a></li>
-                        <li><a href="#">Link</a></li>
-                        <li><a href="#">Link</a></li>
-                        <li><a href="#">Link</a></li>
+                        <li class="active"><a href="/">Home</a></li>
                     </ul>
                 </div>
             </div>

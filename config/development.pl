@@ -5,7 +5,8 @@ my $dbpath;
 if ( -d '/home/dotcloud/') {
     $dbpath = "/home/dotcloud/development.db";
 } else {
-    $dbpath = File::Spec->catfile($basedir, 'db', 'development.db');
+    my $edam_env = $ENV{EDAM_ENV} || 'server';
+    $dbpath = File::Spec->catfile($basedir, 'db', "$edam_env.db");
 }
 +{
     'DBI' => [
