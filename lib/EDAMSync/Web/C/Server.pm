@@ -14,19 +14,15 @@ use Encode;
 sub state {
     my ($class, $c) = @_;
 
-    my $client_name = 'client';
-
     my $full_sync_before_row = $c->dbh->selectrow_hashref(
         q{SELECT * FROM full_sync_before WHERE client_name = ?},
-        {
-        },
-        $client_name,
+        {},
+        'client',
     );
     
     my $update_count_row = $c->dbh->selectrow_hashref(
         q{SELECT max(usn) as update_count FROM entry},
-        {
-        },
+        {},
     );
     my $full_sync_before_epoch = $full_sync_before_row->{full_sync_before} ? DateTime::Format::MySQL->parse_datetime($full_sync_before_row->{full_sync_before})->epoch : 0;
     $c->render_json({
@@ -56,7 +52,7 @@ sub entries {
         );
     }
 
-    $c->create_response(200, [], encode_json({
+    $c->create_response(200, ['Content-Type' => "application/json; charset=utf8"], encode_json({
         status => 'ok',
         entries => $entries,
     }));
@@ -71,19 +67,20 @@ sub sync {
     my ($class, $c) = @_;
     my $client_name = $c->req->param('client_name');
 
-    my $entries = JSON::XS->new->decode($c->req->param('entries'));
+    my $json = JSON::XS->new->decode($c->req->param('entries'));
 
-    $entries = $entries->{entries};
+    my $client_entries = $json->{entries};
     my @created_entries;
     my @conflicted_entries;
-    my @client_uuids = map { $_->{uuid} } @$entries;
+    my @client_uuids = map { $_->{uuid} } @$client_entries;
     my $now = DateTime->now;
     my $update_count;
     my ($sql, @bind) = sql_interp(q{SELECT * FROM entry WHERE uuid IN}, \@client_uuids);
     my $server_entries = $c->dbh->selectall_arrayref(
         $sql,
         {
-            Slice => {}},
+            Slice => {}
+        },
         @bind,
     );
     my %server_entries_map = map { $_->{uuid} => $_ } @$server_entries;
@@ -93,23 +90,22 @@ sub sync {
 
         my $update_count_row = $c->dbh->selectrow_hashref(
             q{SELECT max(usn) as update_count FROM entry},
-            {
-            },
+            {},
         );
         $update_count = $update_count_row->{update_count};
-        for my $client_entry (@$entries) {
-            warn 'obj';
+        for my $client_entry (@$client_entries) {
+            
             all { defined $client_entry->{$_} }qw/body uuid usn/ or return $c->create_response(400, [], "parameter missing");
-
-
+            
             my $server_entry = $server_entries_map{$client_entry->{uuid}};
             if ($server_entry) {
+                warn 'server usn ' . $server_entry->{usn};
+                warn 'client usn ' . $client_entry->{usn};
                 ## update_entry
                 if ($server_entry->{usn} == $client_entry->{usn} && $client_entry->{dirty}) {
                     my $update_count_row = $c->dbh->selectrow_hashref(
                         q{SELECT max(usn) as update_count FROM entry},
-                        {
-                        },
+                        {},
                     );
                     warn 'update db';
                     $c->dbh->do_i(
@@ -124,21 +120,26 @@ sub sync {
                     );
                     my $updated_entry = $c->dbh->selectrow_hashref(
                         q{select * from entry where uuid = ?},
-                        {
-                        },
+                        {},
                         $client_entry->{uuid},
                     );
                     push @created_entries, $updated_entry;
                 }
-                else {
+                elsif ($server_entry->{usn} > $client_entry->{usn}) {
                     ## conflict
+                    warn 'conflict!!!!';
                     if ($server_entry->{body} ne $client_entry->{body}) {
-                        push @conflicted_entries, $client_entry;
+                        push @conflicted_entries, +{
+                            client => $client_entry,
+                            server => $server_entry,
+                        };
                     }
+                }
+                else {
+                    ## 想定していないエラー
                 }
             }
             else {
-
                 warn 'Insert DB';
                 $c->dbh->insert
                     (entry => +{
@@ -158,33 +159,16 @@ sub sync {
             }
         }
 
-        my $full_sync_before_row = $c->dbh->selectrow_hashref(
-            q{select * from full_sync_before where client_name = ?},
-            {
-            },
-            'client',
-        );
-        
-        if ($full_sync_before_row) {
-            $c->dbh->do_i(
-                q{UPDATE full_sync_before SET}, +{
-                    full_sync_before => DateTime::Format::MySQL->format_datetime($now),
-                },
-                q{WHERE}, +{
-                    client_name => 'client',
-                },
-            );
-        }
-        else {
-            $c->dbh->insert(full_sync_before => +{
+        $c->dbh->do_i(
+            q{REPLACE INTO full_sync_before}, +{
                 client_name      => 'client',
-                full_sync_before => DateTime::Format::MySQL->format_datetime($now)
-            });
-        }
+                full_sync_before => DateTime::Format::MySQL->format_datetime($now),
+                }
+        );
 
         $txn->commit;
     }
-    $c->create_response(200, [], encode_json({
+    $c->create_response(200, ['Content-Type' => "application/json; charset=utf8"], encode_json({
         status => @conflicted_entries ? 'ok' : 'conflicted',
         entries => \@created_entries || [],
         conflicted_entries => \@conflicted_entries || [],
