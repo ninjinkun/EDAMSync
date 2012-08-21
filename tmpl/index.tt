@@ -46,9 +46,8 @@ $('#sync').click(function() {
 
     if (data.status === 'conflict') {
       $.post('/client/api/resolve', { conflicted_entries : JSON.stringify({ conflicted_entries : data.conflicted_entries})}, function(data){
-       var messageHtml = $('#message').html();
-       messageHtml + 'コンフリクトが発生したので、新規エントリーを作成しました<br>解決後に再同期を実行して下さい';
-       
+       var messageHtml = $('#message').html() + 'コンフリクトが発生したので、新規エントリーを作成しました<br>解決後に再同期を実行して下さい';
+       $('#message').html(messageHtml);
        var resultHtml = $('#sync-result').html() + JSON.stringify(data);       
        $('#sync-result').html(resultHtml);
 

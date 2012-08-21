@@ -112,7 +112,7 @@ sub sync {
                         q{UPDATE entry SET}, +{
                             body => $client_entry->{body},
                             usn  => ++$update_count,
-                            updated_at => DateTime::Format::MySQL->format_datetime(DateTime->now),
+                            updated_at => $client_entry->{updated_at},
                         },
                         q{WHERE}, +{
                             uuid => $client_entry->{uuid},
@@ -141,8 +141,7 @@ sub sync {
             }
             else {
                 warn 'Insert DB';
-                $c->dbh->insert
-                    (entry => +{
+                $c->dbh->insert(entry => {
                     body       => $client_entry->{body},
                     created_at => DateTime::Format::MySQL->format_datetime(DateTime->now),
                     updated_at => DateTime::Format::MySQL->format_datetime(DateTime->now),
@@ -160,16 +159,16 @@ sub sync {
         }
 
         $c->dbh->do_i(
-            q{REPLACE INTO full_sync_before}, +{
+            q{REPLACE INTO full_sync_before} => {
                 client_name      => 'client',
                 full_sync_before => DateTime::Format::MySQL->format_datetime($now),
-                }
+            }
         );
 
         $txn->commit;
     }
     $c->render_json({
-        status => @conflicted_entries ? 'ok' : 'conflicted',
+        status => @conflicted_entries ? 'conflicted' :  'ok',
         entries => \@created_entries || [],
         conflicted_entries => \@conflicted_entries || [],
         server_current_time => $now->epoch,

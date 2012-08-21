@@ -152,8 +152,8 @@ sub _sync {
             if ($client_entry->{dirty})  {
                 ## conflict
                 push @conflicted_entries, +{
-                    client_entries => $client_entry,
-                    server_entries => $server_entries,
+                    client => $client_entry,
+                    server => $server_entry,
                 };
             }
             else {
@@ -234,6 +234,7 @@ sub _send_changes {
         $c->dbh->do_i(
             q{UPDATE entry SET}, +{
                 usn   => $server_entry->{usn},
+                updated_at => $server_entry->{updated_at},
                 dirty => 0,
             },
             q{WHERE}, +{
