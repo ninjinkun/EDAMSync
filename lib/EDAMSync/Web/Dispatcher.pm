@@ -5,11 +5,6 @@ use utf8;
 
 use Amon2::Web::Dispatcher::Lite;
 
-use DateTime;
-use DateTime::Format::MySQL;
-use Data::UUID;
-
-
 use EDAMSync::Web::C::Server;
 use EDAMSync::Web::C::Client;
 use EDAMSync::Web::C::Client::Api;
