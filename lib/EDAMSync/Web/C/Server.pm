@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use utf8;
 
-use JSON::XS;
+use JSON;
 use DateTime;
 use DateTime::Format::MySQL;
 use SQL::Interp qw(sql_interp);;
@@ -52,10 +52,10 @@ sub entries {
         );
     }
 
-    $c->create_response(200, ['Content-Type' => "application/json; charset=utf8"], encode_json({
+    $c->render_json({
         status => 'ok',
         entries => $entries,
-    }));
+    });
     # $c->render_json({
     #     status => 'ok',
     #     entries => $entries,
@@ -67,7 +67,7 @@ sub sync {
     my ($class, $c) = @_;
     my $client_name = $c->req->param('client_name');
 
-    my $json = JSON::XS->new->decode($c->req->param('entries'));
+    my $json = JSON->new->decode($c->req->param('entries'));
 
     my $client_entries = $json->{entries};
     my @created_entries;
@@ -168,13 +168,13 @@ sub sync {
 
         $txn->commit;
     }
-    $c->create_response(200, ['Content-Type' => "application/json; charset=utf8"], encode_json({
+    $c->render_json({
         status => @conflicted_entries ? 'ok' : 'conflicted',
         entries => \@created_entries || [],
         conflicted_entries => \@conflicted_entries || [],
         server_current_time => $now->epoch,
         server_update_count => $update_count,
-    }));
+    });
 };
 
 1;

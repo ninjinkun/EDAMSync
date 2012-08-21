@@ -4,7 +4,7 @@ use warnings;
 use utf8;
 
 use LWP::UserAgent;
-use JSON::XS;
+use JSON;
 use SQL::Interp qw(sql_interp);;
 use DateTime;
 use DateTime::Format::MySQL;
@@ -46,18 +46,17 @@ sub sync {
             $c,
             will_sync_entries => $will_sync_entries,
             last_update_count => $last_update_count,
-            server_update_count => $server_update_count,
         );
 
         my $synchronized_entries = $send_change_res{synchronized_entries};
         my @conflicted_entries = (@$conflicted_entries, @{$send_change_res{conflicted_entries}});
 
-        return $c->create_response(200, [], encode_json({
+        return $c->render_json({
             status               => scalar @conflicted_entries ? 'conflict' : 'ok',
             synchronized_entries => $synchronized_entries,
             conflicted_entries   => \@conflicted_entries,
             type                 => 'full sync',
-        }));
+        });
     }
     elsif (defined $full_sync_before && defined $last_sync_time && $full_sync_before == $last_sync_time) {
         my $client_entries = $c->dbh->selectall_arrayref(
@@ -69,16 +68,15 @@ sub sync {
             $c, 
             will_sync_entries => $client_entries,
             last_update_count => $last_update_count,
-            server_update_count => $server_update_count,
         );
         my $synchronized_entries = $res{synchronized_entries};
         my $conflicted_entries = $res{conflicted_entries};
-        return $c->create_response(200, [], encode_json({
+        return $c->render_json({
             status               => scalar @$conflicted_entries ? 'conflict' : 'ok',
             synchronized_entries => $synchronized_entries,
             conflicted_entries   => $conflicted_entries,
             type                 => 'send changes',
-        }));
+        });
     }
     else {
         warn 'Incremental Sync';
@@ -94,21 +92,15 @@ sub sync {
             $c, 
             will_sync_entries => $will_sync_entries,
             last_update_count => $last_update_count,
-            server_update_count => $server_update_count,
         );
         my $synchronized_entries = $send_res{synchronized_entries};
         @$conflicted_entries = (@$conflicted_entries, @{$send_res{conflicted_entries}});
-        return $c->create_response(200, ['Content-Type' => "application/json; charset=utf8"], encode_json({
+        return $c->render_json({
             status => scalar @$conflicted_entries ? 'conflict' : 'ok',
             synchronized_entries => $synchronized_entries,
             conflicted_entries => $conflicted_entries,
             type => 'incrementl sync',
-        }));
-
-        # return $c->render_json({
-        #     synced_entries => $will_sync_entries,
-        #     type => 'incrementl sync',
-        # });
+        });
     }
     
 }
@@ -155,14 +147,18 @@ sub _sync {
             } else {
                 ## now syncing
             }
-        } elsif ($server_entry->{usn} > $client_entry->{usn}) {
-            push @will_save_entries, $server_entry;
-        } else {
-            ## conflict
-            push @conflicted_entries, +{
-                client_entries => $client_entry,
-                server_entries => $server_entries,
-            };
+        }
+        elsif ($server_entry->{usn} > $client_entry->{usn}) {
+            if ($client_entry->{dirty})  {
+                ## conflict
+                push @conflicted_entries, +{
+                    client_entries => $client_entry,
+                    server_entries => $server_entries,
+                };
+            }
+            else {
+                push @will_save_entries, $server_entry;
+            }
         }
     }
 
@@ -171,13 +167,13 @@ sub _sync {
         for my $entry (@will_save_entries) {
             if ($client_uuids_map{$entry->{uuid}}) {
                 $c->dbh->do_i(
-                    q{UPDATE entry SET}, +{
+                    q{UPDATE entry SET} => +{
                         body  => $entry->{body},
                         usn   => $entry->{usn},
                         dirty => 0,
                         updated_at => $entry->{updated_at},
                     },
-                    q{WHERE}, +{
+                    q{WHERE} => +{
                         uuid => $entry->{uuid}
                     },
                 );
@@ -185,6 +181,13 @@ sub _sync {
                 warn "insert!!";
                 $c->dbh->insert(entry => $entry);
             }
+        }
+        for my $entry (@will_remove_entries) {
+            $c->dbh->do_i(
+                q{DELETE FROM entry WHERE} => {
+                    uuid => $entry->{uuid},
+                }
+            );
         }
         $txn->commit;
     }
@@ -206,24 +209,26 @@ sub _send_changes {
     my $ua = LWP::UserAgent->new;
 
     my $res = $ua->post("http://$server_host/server/api/sync", [
-        entries => JSON::XS->new->encode({entries => $will_sync_entries }),
+        entries => JSON->new->encode({entries => $will_sync_entries }),
         #            csrf_token => $c->get_csrf_defender_token,
     ]);
 #    return if $res->code != 200;
 
-    my $json = decode_json($res->content);
+    my $json = decode_json($res->content || '{}');
     my $server_current_time = DateTime->from_epoch(epoch => $json->{server_current_time});
     my $server_update_count = $json->{server_update_count};
     my $server_entries = $json->{entries};
 
-    my @conflicted_entries = @{$json->{conflicted_entries}} || ();
+    my @conflicted_entries = @{$json->{conflicted_entries} || []};
     my @synchronized_entries;
 
     for my $server_entry (@$server_entries) {
         if ($server_entry->{usn} == $last_update_count + 1) {
-            ## 何かする
+            ## last_update_countを更新する
+
         } elsif ($server_entry->{usn} > $last_update_count + 1) {
-            ## 何かする                
+            ## incremental syncを再実行する
+
         }
 
         $c->dbh->do_i(
@@ -259,15 +264,16 @@ sub _send_changes {
 
 ## 今回は別のエントリーを作ることで対処する
 sub resolve {
-    my ($class, $c, %args) = @_;
-    my @conflicted_entries = @{$args{conflicted_entries}};
-
+    my ($class, $c) = @_;
+    my $json = JSON->new->decode($c->req->param('conflicted_entries') || '{}');
+    my @conflicted_entries = @{$json->{conflicted_entries} || []};
+    
     my $txn = $c->dbh->txn_scope;
     my @resolved_entries;
     my @uuids;
     for my $pair (@conflicted_entries) {
-        my $client_entry = $pair->{client_entry};
-        my $new_uuid = Data::UUID->create_str;
+        my $client_entry = $pair->{client};
+        my $new_uuid = Data::UUID->new->create_str;
         $c->dbh->insert(entry => +{ 
             uuid       => $new_uuid,
             body       => $client_entry->{body},
@@ -292,10 +298,10 @@ sub resolve {
     );
 
     $txn->commit;
-    $c->create_response(200, ['Content-Type' => "application/json; charset=utf8"], encode_json({
+    $c->render_json({
         status => 'ok',
         resolved_entries => $resolved_entries,
-    }));
+    });
 }
 
 1;

@@ -30,14 +30,31 @@
 
 
 <button type="button" id="sync">同期</button>
-<div id="sync-result">
-</div>
+<div id="message"></div>
+<div id="sync-result"></div>
+
 
 <script type="text/javascript">
 $('#sync').click(function() {
   $.post('/client/api/sync', function(data) {
-    console.log(data);
+    $('#message').text(data.type);
+    var messageHtml = $('#message').text() + 'を実行しました<br />';
+    $('#message').html(messageHtml);
+
     $('#sync-result').html(JSON.stringify(data));
+    console.log(data);
+
+    if (data.status === 'conflict') {
+      $.post('/client/api/resolve', { conflicted_entries : JSON.stringify({ conflicted_entries : data.conflicted_entries})}, function(data){
+       var messageHtml = $('#message').html();
+       messageHtml + 'コンフリクトが発生したので、新規エントリーを作成しました<br>解決後に再同期を実行して下さい';
+       
+       var resultHtml = $('#sync-result').html() + JSON.stringify(data);       
+       $('#sync-result').html(resultHtml);
+
+       console.log(data);
+    });
+    }
   });
 });
 </script>

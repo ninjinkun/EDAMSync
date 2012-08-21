@@ -24,6 +24,7 @@ post '/entry/:entry_id'        => sub { EDAMSync::Web::C::Client->edit(@_) };
 post '/entry/:entry_id/delete' => sub { EDAMSync::Web::C::Client->delete(@_) };
 
 post  '/client/api/sync'       => sub { EDAMSync::Web::C::Client::Api->sync(@_) };
+any   '/client/api/resolve'    => sub { EDAMSync::Web::C::Client::Api->resolve(@_) };
 
 post '/server/api/sync'        => sub { EDAMSync::Web::C::Server->sync(@_) };
 get  '/server/api/entries'     => sub { EDAMSync::Web::C::Server->entries(@_) };
