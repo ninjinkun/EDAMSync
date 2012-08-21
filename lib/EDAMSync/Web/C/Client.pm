@@ -3,8 +3,6 @@ use strict;
 use warnings;
 use utf8;
 
-use LWP::UserAgent;
-use JSON::XS;
 use SQL::Interp qw(sql_interp);;
 use DateTime;
 use DateTime::Format::MySQL;

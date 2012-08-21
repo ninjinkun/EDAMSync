@@ -9,7 +9,6 @@ use DateTime::Format::MySQL;
 use SQL::Interp qw(sql_interp);;
 use List::MoreUtils qw(all);
 use Data::UUID;
-use Encode;
 
 sub state {
     my ($class, $c) = @_;
@@ -67,7 +66,7 @@ sub sync {
     my ($class, $c) = @_;
     my $client_name = $c->req->param('client_name');
 
-    my $json = JSON->new->decode($c->req->param('entries'));
+    my $json = JSON->new->decode($c->req->param('entries') || '{}');
 
     my $client_entries = $json->{entries};
     my @created_entries;
