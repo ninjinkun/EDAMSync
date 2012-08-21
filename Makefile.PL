@@ -2,7 +2,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     NAME          => 'EDAMSync',
-    AUTHOR        => 'Some Person <person@example.com>',
+    AUTHOR        => 'ninjinkun <>',
     VERSION_FROM  => 'lib/EDAMSync.pm',
     PREREQ_PM     => {
         'Amon2'                           => '3.52',
@@ -17,6 +17,11 @@ WriteMakefile(
         'Plack::Session'                  => '0.14',
         'Test::WWW::Mechanize::PSGI'      => '0',
         'Time::Piece'                     => '1.20',
+        'DateTime'                        => '0.72',
+        'DateTime::Format::MySQL'         => '0.04',
+        'Data::UUID'                      => '1.218',
+        'SQL::Interp'                     => '1.21',
+        'List::MoreUtils'                 => '0.33',
     },
     MIN_PERL_VERSION => '5.008001',
     (-d 'xt' and $ENV{AUTOMATED_TESTING} || $ENV{RELEASE_TESTING}) ? (
