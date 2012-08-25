@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model name="" userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="1487" systemVersion="11E53" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
+    <entity name="Entry" syncable="YES">
+        <attribute name="body" attributeType="String" syncable="YES"/>
+        <attribute name="created_at" attributeType="Date" syncable="YES"/>
+        <attribute name="dirty" attributeType="Boolean" defaultValueString="NO" indexed="YES" syncable="YES"/>
+        <attribute name="updated_at" attributeType="Date" indexed="YES" syncable="YES"/>
+        <attribute name="usn" attributeType="Integer 64" defaultValueString="0" indexed="YES" syncable="YES"/>
+        <attribute name="uuid" attributeType="String" indexed="YES" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="Entry" positionX="0" positionY="0" width="0" height="0"/>
+    </elements>
+</model>
