@@ -17,22 +17,21 @@
 -(void)main {
     NSLog(@"start");
     self.progress = 0.1;
-    
+    _managedObjectContext = [[CoreDataManager sharedManager] newManagedObjectContext];
+
+    // サーバーからState情報を取得
     NSMutableString *stateUrl = [NSMutableString stringWithFormat:@"%@/server/api/state", EDAM_SERVER_HOST];
     NSInteger afterUSN = [ClientStateManager sharedmanager].lastUpdatedCount;
     if (afterUSN) {
         [stateUrl appendFormat:@"?after_usn=%d", afterUSN];
     }
-    _managedObjectContext = [[CoreDataManager sharedManager] newManagedObjectContext];
     NSURLRequest *req = [NSURLRequest requestWithURL:[NSURL URLWithString:stateUrl]];
     NSURLResponse *res;
     NSError *error;
     NSData *jsonData = [NSURLConnection sendSynchronousRequest:req returningResponse:&res error:&error];
     if (!jsonData) {
         NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-        abort();
     }
-
     NSDictionary *state = [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&error];
 
     NSDate *fullSyncBefore = [state objectForKey:@"full_sync_before"] ? [NSDate dateWithTimeIntervalSince1970:[[state objectForKey:@"full_sync_before"] integerValue]] : nil ;
@@ -42,23 +41,28 @@
     NSInteger lastUpdatedCount = [ClientStateManager sharedmanager].lastUpdatedCount;
     self.progress = 0.2;
     NSLog(@"state %@", state);
-    
+
+    // 結果の配列
     NSArray *syncronizedEntries = @[];
     NSArray *conflictedEntries = @[];
     if (self.isCancelled) return;
 
-    // fullSyncbefore > lastSyncTime
     NSLog(@"before %@", fullSyncBefore);
     NSLog(@"last %@", lastSyncTime);
     
+    // fullSyncbefore > lastSyncTime
     if ([fullSyncBefore earlierDate:lastSyncTime] == lastSyncTime) {
+        // Full Sync
         NSLog(@"Full Sync");
         NSDictionary *syncRes = [self sync:0];
+
         self.progress = 0.5;
 
         NSArray *willSyncEntries = [syncRes objectForKey:@"will_sync_entries"];
         conflictedEntries = [syncRes objectForKey:@"conflicted_entries"];
+        
         NSDictionary *sendChangesRes = [self sendChanges:willSyncEntries lastUpdateCount:lastUpdatedCount];
+
         self.progress = 0.8;
         
         NSMutableArray *_conflictedEntries = [conflictedEntries mutableCopy];
@@ -67,13 +71,18 @@
         syncronizedEntries = [sendChangesRes objectForKey:@"syncronized_entries"];
     }
     else if ([lastSyncTime isEqualToDate:fullSyncBefore]) {
+        // Send Changes
         NSLog(@"Send changes");
+
+        // dirtyなものだけ送信する
         NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
         fetchRequest.entity = [NSEntityDescription entityForName:@"Entry" inManagedObjectContext:_managedObjectContext];
         fetchRequest.predicate = [NSPredicate predicateWithFormat:@"(dirty == YES)"];
         NSError *fetchError;
         NSArray *clientEntries = [_managedObjectContext executeFetchRequest:fetchRequest error:&fetchError];
+        
         self.progress = 0.5;
+
         NSDictionary *sendChangesRes = [self sendChanges:clientEntries lastUpdateCount:lastUpdatedCount];
         NSMutableArray *_conflictedEntries = [conflictedEntries mutableCopy];
         [_conflictedEntries addObjectsFromArray:[sendChangesRes objectForKey:@"conflicted_entries"]];
@@ -83,18 +92,21 @@
         self.progress = 0.8;
     }
     else {
-        NSLog(@"Incremental Sync");
         // incremental sync
+        NSLog(@"Incremental Sync");
         NSDictionary *syncRes = [self sync:afterUSN];
         self.progress = 0.5;
 
         NSArray *willSyncEntries = [syncRes objectForKey:@"will_sync_entries"];
         conflictedEntries = [syncRes objectForKey:@"conflicted_entries"];
+        
         NSDictionary *sendChangesRes = [self sendChanges:willSyncEntries lastUpdateCount:lastUpdatedCount];
+        
         NSMutableArray *_conflictedEntries = [conflictedEntries mutableCopy];
         [_conflictedEntries addObjectsFromArray:[sendChangesRes objectForKey:@"conflicted_entries"]];
         conflictedEntries = [_conflictedEntries copy];
         syncronizedEntries = [sendChangesRes objectForKey:@"syncronized_entries"];
+        
         self.progress = 0.8;
     }
     if (self.isCancelled) return;
@@ -120,6 +132,7 @@
 }
 
 -(NSDictionary *)sync:(NSInteger)afterUSN {
+    // エントリー情報を取得
     NSMutableString *entriesUrl = [[NSString stringWithFormat:@"%@/server/api/entries", EDAM_SERVER_HOST] mutableCopy];
     if (afterUSN) {
         [entriesUrl appendFormat:@"?after_usn=%d", afterUSN];
@@ -129,12 +142,17 @@
     NSError *requestError;
     NSError *jsonError;
     NSData *jsonData = [NSURLConnection sendSynchronousRequest:req returningResponse:&res error:&requestError];
+    if (!jsonData) {
+        NSLog(@"Unresolved error %@, %@", requestError, [requestError userInfo]);
+    }
+    
     NSDictionary *json = [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&jsonError];
     NSArray *serverEntries = [json objectForKey:@"entries"];
     
     NSInteger serverUpdateCount = [[json objectForKey:@"server_update_count"] integerValue];
     NSDate *severCurrentTime = [NSDate dateWithTimeIntervalSince1970:[[json objectForKey:@"server_current_time"] integerValue]];
 
+    // サーバーのUUIDと同じものもしくはdirtyフラグが立っているものをCoreDataから取得
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     fetchRequest.entity = [NSEntityDescription entityForName:@"Entry" inManagedObjectContext:_managedObjectContext];
     fetchRequest.predicate = [NSPredicate predicateWithFormat:@"(uuid IN %@ OR dirty == YES)", [serverEntries valueForKeyPath:@"uuid"]];
@@ -147,12 +165,15 @@
     NSSet *clientUUIDSet = [NSSet setWithArray:[clientEntries valueForKeyPath:@"uuid"]];
     NSSet *serverUUIDSet = [NSSet setWithArray:[serverEntries valueForKeyPath:@"uuid"]];
     
+    // サーバーのみのエントリー
     NSMutableSet *willSaveUUIDSet = [serverUUIDSet mutableCopy];
     [willSaveUUIDSet minusSet:clientUUIDSet];
     
+    // クライアントのみのエントリー
     NSMutableSet *clientOnlyUUIDSet = [clientUUIDSet mutableCopy];
     [clientOnlyUUIDSet minusSet:serverUUIDSet];
     
+    // クライアントとローカルの両方にエントリがあってかつdirtyフラグが立っている
     NSMutableSet *needsResolveUUIDSet = [clientUUIDSet mutableCopy];
     [needsResolveUUIDSet intersectSet:serverUUIDSet];
     
@@ -218,9 +239,8 @@
 
 -(NSDictionary *)sendChanges:(NSArray *)willSyncEntries lastUpdateCount:(NSInteger)lastUpdateCount {
     NSString *syncUrl = [NSString stringWithFormat:@"%@/server/api/sync", EDAM_SERVER_HOST];
-    NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:syncUrl]];
-    [req setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"content-type"];
-    req.HTTPMethod = @"POST";
+    
+    // リクエスト用のデータを組み立てる
     NSMutableArray *convertedEntries = [@[] mutableCopy];
     for (NSManagedObject *entry in willSyncEntries) {
         [convertedEntries addObject:@{
@@ -236,7 +256,13 @@
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:@{ @"entries": convertedEntries } options:0 error:&jsonError];
     NSMutableData * body = [[@"client=iphone&entries=" dataUsingEncoding:NSUTF8StringEncoding] mutableCopy];
     [body appendData:jsonData];
+    
+    // POST Request
+    NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:syncUrl]];
+    [req setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"content-type"];
+    req.HTTPMethod = @"POST";
     req.HTTPBody = body;
+    
     NSURLResponse *res;
     NSError *requestError;
     NSData *data = [NSURLConnection sendSynchronousRequest:req returningResponse:&res error:&requestError];
@@ -244,16 +270,18 @@
         NSLog(@"Unresolved error %@, %@", requestError, [requestError userInfo]);
         abort();
     }
+    
     NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:&jsonError];
     NSInteger severUpdateCount = [[json objectForKey:@"server_update_count"] ?: @(0) integerValue];
     NSDate *severCurrentTime = [NSDate dateWithTimeIntervalSince1970:[[json objectForKey:@"server_current_time"] integerValue]];
     NSArray *serverEntries = [json objectForKey:@"entries"];
     NSArray *conflictedEntries = [json objectForKey:@"conflicted_entries"] ?: @[];
     
+    // サーバーのエントリと同一のUUIDのものをCoreDataから取得
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-    fetchRequest.entity = [NSEntityDescription entityForName:@"Entry" inManagedObjectContext:_managedObjectContext];
     NSArray *serverUUIDs = [serverEntries valueForKeyPath:@"uuid"];
     fetchRequest.predicate = [NSPredicate predicateWithFormat:@"(uuid IN %@)", serverUUIDs.count ? serverUUIDs : @[]];
+    fetchRequest.entity = [NSEntityDescription entityForName:@"Entry" inManagedObjectContext:_managedObjectContext];
     NSError *fetchError;
     NSArray *clientEntries = [_managedObjectContext executeFetchRequest:fetchRequest error:&fetchError];
     NSDictionary *clientUUIDMap = [NSDictionary dictionaryWithObjects:clientEntries forKeys:[clientEntries valueForKeyPath:@"uuid"]];
@@ -262,10 +290,10 @@
     for (NSDictionary *serverEntry in serverEntries) {
         NSManagedObject *clientEntry = [clientUUIDMap objectForKey:[serverEntry objectForKey:@"uuid"]];
         if ([[serverEntry objectForKey:@"usn"] integerValue] == lastUpdateCount + 1) {
-            // last update count を更新する
+            // TODO: last update count を更新する
         }
         else if ([[serverEntry objectForKey:@"usn"] integerValue] > lastUpdateCount + 1) {
-            // incremental syncを実行する
+            // TODO: incremental syncを実行する
         }
         [clientEntry setValue:[serverEntry valueForKey:@"body"] forKey:@"body"];
         [clientEntry setValue:[serverEntry valueForKey:@"usn"] forKey:@"usn"];

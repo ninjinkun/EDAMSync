@@ -26,8 +26,6 @@
 -(void)main {
     _managedObjectContext = [[CoreDataManager sharedManager] newManagedObjectContext];
     
-    
-    
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     fetchRequest.entity = [NSEntityDescription entityForName:@"Entry" inManagedObjectContext:_managedObjectContext];
     fetchRequest.predicate = [NSPredicate predicateWithFormat:@"(uuid IN %@)", [_conflictedEntries valueForKeyPath:@"client.uuid"]  ?: @[]];
