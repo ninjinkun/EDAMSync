@@ -234,7 +234,7 @@
     }
     NSError *jsonError;
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:@{ @"entries": convertedEntries } options:0 error:&jsonError];
-    NSMutableData * body = [[@"entries=" dataUsingEncoding:NSUTF8StringEncoding] mutableCopy];
+    NSMutableData * body = [[@"client=iphone&entries=" dataUsingEncoding:NSUTF8StringEncoding] mutableCopy];
     [body appendData:jsonData];
     req.HTTPBody = body;
     NSURLResponse *res;
