@@ -11,7 +11,7 @@ use Data::UUID;
 sub index {
     my ($class, $c) = @_;
     my $entries = $c->dbh->selectall_arrayref(
-        q{select * from entry ORDER BY updated_at},
+        q{select * from entry ORDER BY updated_at DESC},
         {
             Slice => {}
         },
