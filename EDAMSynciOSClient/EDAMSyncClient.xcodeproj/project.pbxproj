@@ -1,0 +1,560 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		263F83D915E3CFD200477E31 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 263F83D815E3CFD200477E31 /* UIKit.framework */; };
+		263F83DB15E3CFD200477E31 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 263F83DA15E3CFD200477E31 /* Foundation.framework */; };
+		263F83DD15E3CFD200477E31 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 263F83DC15E3CFD200477E31 /* CoreGraphics.framework */; };
+		263F83DF15E3CFD200477E31 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 263F83DE15E3CFD200477E31 /* CoreData.framework */; };
+		263F83E515E3CFD200477E31 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 263F83E315E3CFD200477E31 /* InfoPlist.strings */; };
+		263F83E715E3CFD200477E31 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 263F83E615E3CFD200477E31 /* main.m */; };
+		263F83EB15E3CFD200477E31 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 263F83EA15E3CFD200477E31 /* AppDelegate.m */; };
+		263F83EE15E3CFD200477E31 /* MainStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 263F83EC15E3CFD200477E31 /* MainStoryboard.storyboard */; };
+		263F83F115E3CFD200477E31 /* EDAMSyncClient.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 263F83EF15E3CFD200477E31 /* EDAMSyncClient.xcdatamodeld */; };
+		263F83FF15E3CFD200477E31 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 263F83FE15E3CFD200477E31 /* SenTestingKit.framework */; };
+		263F840015E3CFD200477E31 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 263F83D815E3CFD200477E31 /* UIKit.framework */; };
+		263F840115E3CFD200477E31 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 263F83DA15E3CFD200477E31 /* Foundation.framework */; };
+		263F840215E3CFD200477E31 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 263F83DE15E3CFD200477E31 /* CoreData.framework */; };
+		263F840A15E3CFD200477E31 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 263F840815E3CFD200477E31 /* InfoPlist.strings */; };
+		263F840D15E3CFD200477E31 /* EDAMSyncClientTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 263F840C15E3CFD200477E31 /* EDAMSyncClientTests.m */; };
+		26F467E615E874E60027B476 /* DetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 26F467E315E874E60027B476 /* DetailViewController.m */; };
+		26F467E715E874E60027B476 /* MasterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 26F467E515E874E60027B476 /* MasterViewController.m */; };
+		26F467F215E874F50027B476 /* ClientStateManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 26F467EA15E874F50027B476 /* ClientStateManager.m */; };
+		26F467F315E874F50027B476 /* CoreDataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 26F467EC15E874F50027B476 /* CoreDataManager.m */; };
+		26F467F415E874F50027B476 /* ResolveOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 26F467EF15E874F50027B476 /* ResolveOperation.m */; };
+		26F467F515E874F50027B476 /* SyncOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 26F467F115E874F50027B476 /* SyncOperation.m */; };
+		26F467F915E875060027B476 /* NSDate+MySQL.m in Sources */ = {isa = PBXBuildFile; fileRef = 26F467F815E875060027B476 /* NSDate+MySQL.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		263F840315E3CFD200477E31 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 263F83CB15E3CFD200477E31 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 263F83D315E3CFD200477E31;
+			remoteInfo = EDAMSyncClient;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		263F83D415E3CFD200477E31 /* EDAMSyncClient.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EDAMSyncClient.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		263F83D815E3CFD200477E31 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		263F83DA15E3CFD200477E31 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		263F83DC15E3CFD200477E31 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		263F83DE15E3CFD200477E31 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		263F83E215E3CFD200477E31 /* EDAMSyncClient-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "EDAMSyncClient-Info.plist"; sourceTree = "<group>"; };
+		263F83E415E3CFD200477E31 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		263F83E615E3CFD200477E31 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		263F83E815E3CFD200477E31 /* EDAMSyncClient-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "EDAMSyncClient-Prefix.pch"; sourceTree = "<group>"; };
+		263F83E915E3CFD200477E31 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		263F83EA15E3CFD200477E31 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		263F83ED15E3CFD200477E31 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = en; path = en.lproj/MainStoryboard.storyboard; sourceTree = "<group>"; };
+		263F83F015E3CFD200477E31 /* EDAMSyncClient.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = EDAMSyncClient.xcdatamodel; sourceTree = "<group>"; };
+		263F83FD15E3CFD200477E31 /* EDAMSyncClientTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EDAMSyncClientTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
+		263F83FE15E3CFD200477E31 /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
+		263F840715E3CFD200477E31 /* EDAMSyncClientTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "EDAMSyncClientTests-Info.plist"; sourceTree = "<group>"; };
+		263F840915E3CFD200477E31 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		263F840B15E3CFD200477E31 /* EDAMSyncClientTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EDAMSyncClientTests.h; sourceTree = "<group>"; };
+		263F840C15E3CFD200477E31 /* EDAMSyncClientTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EDAMSyncClientTests.m; sourceTree = "<group>"; };
+		26F467E215E874E60027B476 /* DetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DetailViewController.h; path = ViewController/DetailViewController.h; sourceTree = "<group>"; };
+		26F467E315E874E60027B476 /* DetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DetailViewController.m; path = ViewController/DetailViewController.m; sourceTree = "<group>"; };
+		26F467E415E874E60027B476 /* MasterViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MasterViewController.h; path = ViewController/MasterViewController.h; sourceTree = "<group>"; };
+		26F467E515E874E60027B476 /* MasterViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MasterViewController.m; path = ViewController/MasterViewController.m; sourceTree = "<group>"; };
+		26F467E915E874F50027B476 /* ClientStateManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ClientStateManager.h; sourceTree = "<group>"; };
+		26F467EA15E874F50027B476 /* ClientStateManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ClientStateManager.m; sourceTree = "<group>"; };
+		26F467EB15E874F50027B476 /* CoreDataManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreDataManager.h; sourceTree = "<group>"; };
+		26F467EC15E874F50027B476 /* CoreDataManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CoreDataManager.m; sourceTree = "<group>"; };
+		26F467EE15E874F50027B476 /* ResolveOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ResolveOperation.h; sourceTree = "<group>"; };
+		26F467EF15E874F50027B476 /* ResolveOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ResolveOperation.m; sourceTree = "<group>"; };
+		26F467F015E874F50027B476 /* SyncOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SyncOperation.h; sourceTree = "<group>"; };
+		26F467F115E874F50027B476 /* SyncOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SyncOperation.m; sourceTree = "<group>"; };
+		26F467F715E875060027B476 /* NSDate+MySQL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDate+MySQL.h"; sourceTree = "<group>"; };
+		26F467F815E875060027B476 /* NSDate+MySQL.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDate+MySQL.m"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		263F83D115E3CFD200477E31 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				263F83D915E3CFD200477E31 /* UIKit.framework in Frameworks */,
+				263F83DB15E3CFD200477E31 /* Foundation.framework in Frameworks */,
+				263F83DD15E3CFD200477E31 /* CoreGraphics.framework in Frameworks */,
+				263F83DF15E3CFD200477E31 /* CoreData.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		263F83F915E3CFD200477E31 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				263F83FF15E3CFD200477E31 /* SenTestingKit.framework in Frameworks */,
+				263F840015E3CFD200477E31 /* UIKit.framework in Frameworks */,
+				263F840115E3CFD200477E31 /* Foundation.framework in Frameworks */,
+				263F840215E3CFD200477E31 /* CoreData.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		263F83C915E3CFD200477E31 = {
+			isa = PBXGroup;
+			children = (
+				263F83E015E3CFD200477E31 /* EDAMSyncClient */,
+				263F840515E3CFD200477E31 /* EDAMSyncClientTests */,
+				263F83D715E3CFD200477E31 /* Frameworks */,
+				263F83D515E3CFD200477E31 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		263F83D515E3CFD200477E31 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				263F83D415E3CFD200477E31 /* EDAMSyncClient.app */,
+				263F83FD15E3CFD200477E31 /* EDAMSyncClientTests.octest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		263F83D715E3CFD200477E31 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				263F83D815E3CFD200477E31 /* UIKit.framework */,
+				263F83DA15E3CFD200477E31 /* Foundation.framework */,
+				263F83DC15E3CFD200477E31 /* CoreGraphics.framework */,
+				263F83DE15E3CFD200477E31 /* CoreData.framework */,
+				263F83FE15E3CFD200477E31 /* SenTestingKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		263F83E015E3CFD200477E31 /* EDAMSyncClient */ = {
+			isa = PBXGroup;
+			children = (
+				263F841615E3D76E00477E31 /* View */,
+				263F841715E3D77300477E31 /* ViewController */,
+				263F841815E3D77D00477E31 /* Model */,
+				26F467F615E875060027B476 /* Util */,
+				263F83E915E3CFD200477E31 /* AppDelegate.h */,
+				263F83EA15E3CFD200477E31 /* AppDelegate.m */,
+				263F83EC15E3CFD200477E31 /* MainStoryboard.storyboard */,
+				263F83EF15E3CFD200477E31 /* EDAMSyncClient.xcdatamodeld */,
+				263F83E115E3CFD200477E31 /* Supporting Files */,
+			);
+			path = EDAMSyncClient;
+			sourceTree = "<group>";
+		};
+		263F83E115E3CFD200477E31 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				263F83E215E3CFD200477E31 /* EDAMSyncClient-Info.plist */,
+				263F83E315E3CFD200477E31 /* InfoPlist.strings */,
+				263F83E615E3CFD200477E31 /* main.m */,
+				263F83E815E3CFD200477E31 /* EDAMSyncClient-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		263F840515E3CFD200477E31 /* EDAMSyncClientTests */ = {
+			isa = PBXGroup;
+			children = (
+				263F840B15E3CFD200477E31 /* EDAMSyncClientTests.h */,
+				263F840C15E3CFD200477E31 /* EDAMSyncClientTests.m */,
+				263F840615E3CFD200477E31 /* Supporting Files */,
+			);
+			path = EDAMSyncClientTests;
+			sourceTree = "<group>";
+		};
+		263F840615E3CFD200477E31 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				263F840715E3CFD200477E31 /* EDAMSyncClientTests-Info.plist */,
+				263F840815E3CFD200477E31 /* InfoPlist.strings */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		263F841615E3D76E00477E31 /* View */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = View;
+			sourceTree = "<group>";
+		};
+		263F841715E3D77300477E31 /* ViewController */ = {
+			isa = PBXGroup;
+			children = (
+				26F467E215E874E60027B476 /* DetailViewController.h */,
+				26F467E315E874E60027B476 /* DetailViewController.m */,
+				26F467E415E874E60027B476 /* MasterViewController.h */,
+				26F467E515E874E60027B476 /* MasterViewController.m */,
+			);
+			name = ViewController;
+			sourceTree = "<group>";
+		};
+		263F841815E3D77D00477E31 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				26F467E815E874F50027B476 /* Manager */,
+				26F467ED15E874F50027B476 /* Sync */,
+			);
+			name = Model;
+			sourceTree = "<group>";
+		};
+		26F467E815E874F50027B476 /* Manager */ = {
+			isa = PBXGroup;
+			children = (
+				26F467E915E874F50027B476 /* ClientStateManager.h */,
+				26F467EA15E874F50027B476 /* ClientStateManager.m */,
+				26F467EB15E874F50027B476 /* CoreDataManager.h */,
+				26F467EC15E874F50027B476 /* CoreDataManager.m */,
+			);
+			name = Manager;
+			path = Model/Manager;
+			sourceTree = "<group>";
+		};
+		26F467ED15E874F50027B476 /* Sync */ = {
+			isa = PBXGroup;
+			children = (
+				26F467EE15E874F50027B476 /* ResolveOperation.h */,
+				26F467EF15E874F50027B476 /* ResolveOperation.m */,
+				26F467F015E874F50027B476 /* SyncOperation.h */,
+				26F467F115E874F50027B476 /* SyncOperation.m */,
+			);
+			name = Sync;
+			path = Model/Sync;
+			sourceTree = "<group>";
+		};
+		26F467F615E875060027B476 /* Util */ = {
+			isa = PBXGroup;
+			children = (
+				26F467F715E875060027B476 /* NSDate+MySQL.h */,
+				26F467F815E875060027B476 /* NSDate+MySQL.m */,
+			);
+			path = Util;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		263F83D315E3CFD200477E31 /* EDAMSyncClient */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 263F841015E3CFD200477E31 /* Build configuration list for PBXNativeTarget "EDAMSyncClient" */;
+			buildPhases = (
+				263F83D015E3CFD200477E31 /* Sources */,
+				263F83D115E3CFD200477E31 /* Frameworks */,
+				263F83D215E3CFD200477E31 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = EDAMSyncClient;
+			productName = EDAMSyncClient;
+			productReference = 263F83D415E3CFD200477E31 /* EDAMSyncClient.app */;
+			productType = "com.apple.product-type.application";
+		};
+		263F83FC15E3CFD200477E31 /* EDAMSyncClientTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 263F841315E3CFD200477E31 /* Build configuration list for PBXNativeTarget "EDAMSyncClientTests" */;
+			buildPhases = (
+				263F83F815E3CFD200477E31 /* Sources */,
+				263F83F915E3CFD200477E31 /* Frameworks */,
+				263F83FA15E3CFD200477E31 /* Resources */,
+				263F83FB15E3CFD200477E31 /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				263F840415E3CFD200477E31 /* PBXTargetDependency */,
+			);
+			name = EDAMSyncClientTests;
+			productName = EDAMSyncClientTests;
+			productReference = 263F83FD15E3CFD200477E31 /* EDAMSyncClientTests.octest */;
+			productType = "com.apple.product-type.bundle";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		263F83CB15E3CFD200477E31 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0440;
+				ORGANIZATIONNAME = "Satoshi Asano";
+			};
+			buildConfigurationList = 263F83CE15E3CFD200477E31 /* Build configuration list for PBXProject "EDAMSyncClient" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 263F83C915E3CFD200477E31;
+			productRefGroup = 263F83D515E3CFD200477E31 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				263F83D315E3CFD200477E31 /* EDAMSyncClient */,
+				263F83FC15E3CFD200477E31 /* EDAMSyncClientTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		263F83D215E3CFD200477E31 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				263F83E515E3CFD200477E31 /* InfoPlist.strings in Resources */,
+				263F83EE15E3CFD200477E31 /* MainStoryboard.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		263F83FA15E3CFD200477E31 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				263F840A15E3CFD200477E31 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		263F83FB15E3CFD200477E31 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		263F83D015E3CFD200477E31 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				263F83E715E3CFD200477E31 /* main.m in Sources */,
+				263F83EB15E3CFD200477E31 /* AppDelegate.m in Sources */,
+				263F83F115E3CFD200477E31 /* EDAMSyncClient.xcdatamodeld in Sources */,
+				26F467E615E874E60027B476 /* DetailViewController.m in Sources */,
+				26F467E715E874E60027B476 /* MasterViewController.m in Sources */,
+				26F467F215E874F50027B476 /* ClientStateManager.m in Sources */,
+				26F467F315E874F50027B476 /* CoreDataManager.m in Sources */,
+				26F467F415E874F50027B476 /* ResolveOperation.m in Sources */,
+				26F467F515E874F50027B476 /* SyncOperation.m in Sources */,
+				26F467F915E875060027B476 /* NSDate+MySQL.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		263F83F815E3CFD200477E31 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				263F840D15E3CFD200477E31 /* EDAMSyncClientTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		263F840415E3CFD200477E31 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 263F83D315E3CFD200477E31 /* EDAMSyncClient */;
+			targetProxy = 263F840315E3CFD200477E31 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		263F83E315E3CFD200477E31 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				263F83E415E3CFD200477E31 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		263F83EC15E3CFD200477E31 /* MainStoryboard.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				263F83ED15E3CFD200477E31 /* en */,
+			);
+			name = MainStoryboard.storyboard;
+			sourceTree = "<group>";
+		};
+		263F840815E3CFD200477E31 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				263F840915E3CFD200477E31 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		263F840E15E3CFD200477E31 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		263F840F15E3CFD200477E31 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
+				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		263F841115E3CFD200477E31 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "EDAMSyncClient/EDAMSyncClient-Prefix.pch";
+				INFOPLIST_FILE = "EDAMSyncClient/EDAMSyncClient-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		263F841215E3CFD200477E31 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "EDAMSyncClient/EDAMSyncClient-Prefix.pch";
+				INFOPLIST_FILE = "EDAMSyncClient/EDAMSyncClient-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+		263F841415E3CFD200477E31 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/EDAMSyncClient.app/EDAMSyncClient";
+				FRAMEWORK_SEARCH_PATHS = (
+					"\"$(SDKROOT)/Developer/Library/Frameworks\"",
+					"\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "EDAMSyncClient/EDAMSyncClient-Prefix.pch";
+				INFOPLIST_FILE = "EDAMSyncClientTests/EDAMSyncClientTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = Debug;
+		};
+		263F841515E3CFD200477E31 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/EDAMSyncClient.app/EDAMSyncClient";
+				FRAMEWORK_SEARCH_PATHS = (
+					"\"$(SDKROOT)/Developer/Library/Frameworks\"",
+					"\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "EDAMSyncClient/EDAMSyncClient-Prefix.pch";
+				INFOPLIST_FILE = "EDAMSyncClientTests/EDAMSyncClientTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		263F83CE15E3CFD200477E31 /* Build configuration list for PBXProject "EDAMSyncClient" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				263F840E15E3CFD200477E31 /* Debug */,
+				263F840F15E3CFD200477E31 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		263F841015E3CFD200477E31 /* Build configuration list for PBXNativeTarget "EDAMSyncClient" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				263F841115E3CFD200477E31 /* Debug */,
+				263F841215E3CFD200477E31 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		263F841315E3CFD200477E31 /* Build configuration list for PBXNativeTarget "EDAMSyncClientTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				263F841415E3CFD200477E31 /* Debug */,
+				263F841515E3CFD200477E31 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		263F83EF15E3CFD200477E31 /* EDAMSyncClient.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				263F83F015E3CFD200477E31 /* EDAMSyncClient.xcdatamodel */,
+			);
+			currentVersion = 263F83F015E3CFD200477E31 /* EDAMSyncClient.xcdatamodel */;
+			path = EDAMSyncClient.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
+	};
+	rootObject = 263F83CB15E3CFD200477E31 /* Project object */;
+}

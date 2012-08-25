@@ -165,7 +165,7 @@ sub sync {
 
         $c->dbh->do_i(
             q{REPLACE INTO full_sync_before} => {
-                client_name      => 'client',
+                client_name      => $client_name,
                 full_sync_before => DateTime::Format::MySQL->format_datetime($now),
             }
         );
