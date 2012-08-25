@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS entry (
     body         TEXT NOT NULL,
     usn          INTEGER DEFAULT 0,
     dirty        INTEGER DEFAULT 0,
+    expunged     INTEGER DEFAULT 0,
     created_at   DATETIME NOT NULL,
     updated_at   DATETIME
 );

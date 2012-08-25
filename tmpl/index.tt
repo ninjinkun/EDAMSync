@@ -36,7 +36,7 @@
 
 <script type="text/javascript">
 $('#sync').click(function() {
-  $.post('/client/api/sync', function(data) {
+  $.post('/client/api/sync').done(function(data) {
     $('#message').text(data.type);
     var messageHtml = $('#message').text() + 'を実行しました<br />';
     $('#message').html(messageHtml);
@@ -45,7 +45,7 @@ $('#sync').click(function() {
     console.log(data);
 
     if (data.status === 'conflict') {
-      $.post('/client/api/resolve', { conflicted_entries : JSON.stringify({ conflicted_entries : data.conflicted_entries})}, function(data){
+      $.post('/client/api/resolve', { conflicted_entries : JSON.stringify({ conflicted_entries : data.conflicted_entries})}).done(function(data){
        var messageHtml = $('#message').html() + 'コンフリクトが発生したので、新規エントリーを作成しました<br>解決後に再同期を実行して下さい';
        $('#message').html(messageHtml);
        var resultHtml = $('#sync-result').html() + JSON.stringify(data);       

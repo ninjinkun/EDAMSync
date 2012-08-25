@@ -50,8 +50,14 @@ sub entries {
                 Slice => {}},
         );
     }
+    my $update_count_row = $c->dbh->selectrow_hashref(
+        q{SELECT max(usn) as update_count FROM entry},
+        {},
+    );
 
     $c->render_json({
+        server_current_time => time(),
+        server_update_count => $update_count_row->{update_count} || 0,
         status => 'ok',
         entries => $entries,
     });
@@ -61,14 +67,13 @@ sub entries {
     # });
 }
 
-
 sub sync {
     my ($class, $c) = @_;
     my $client_name = $c->req->param('client_name');
 
     my $json = JSON->new->decode($c->req->param('entries') || '{}');
-
     my $client_entries = $json->{entries};
+
     my @created_entries;
     my @conflicted_entries;
     my @client_uuids = map { $_->{uuid} } @$client_entries;
@@ -140,6 +145,7 @@ sub sync {
             }
             else {
                 warn 'Insert DB';
+                warn $server_entry;
                 $c->dbh->insert(entry => {
                     body       => $client_entry->{body},
                     created_at => DateTime::Format::MySQL->format_datetime(DateTime->now),
@@ -171,7 +177,7 @@ sub sync {
         entries => \@created_entries || [],
         conflicted_entries => \@conflicted_entries || [],
         server_current_time => $now->epoch,
-        server_update_count => $update_count,
+        server_update_count => $update_count || 0,
     });
 };
 

@@ -118,6 +118,8 @@ sub _sync {
     warn 'after usn!! ' . $after_usn;
     my $server_entries = $json->{entries};
     my @server_uuids = map { $_->{uuid} } @$server_entries;
+    my $server_current_time = DateTime->from_epoch(epoch => $json->{server_current_time});
+    my $server_update_count = $json->{server_update_count};
     my ($sql, @bind) = sql_interp(q{SELECT * FROM entry WHERE uuid IN}, \@server_uuids, q{or dirty = 1});
     my $client_entries = $c->dbh->selectall_arrayref(
         $sql,
@@ -189,6 +191,11 @@ sub _sync {
                 }
             );
         }
+        $c->dbh->do_i(q{REPLACE INTO client_status}, +{
+            client_name => $c->config->{client_name},
+            last_update_count =>  $server_update_count,
+            last_sync_time    =>  DateTime::Format::MySQL->format_datetime($server_current_time),
+        });
         $txn->commit;
     }
     (
@@ -221,7 +228,7 @@ sub _send_changes {
 
     my @conflicted_entries = @{$json->{conflicted_entries} || []};
     my @synchronized_entries;
-
+    
     for my $server_entry (@$server_entries) {
         if ($server_entry->{usn} == $last_update_count + 1) {
             ## last_update_countを更新する
