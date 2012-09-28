@@ -61,33 +61,25 @@ sub entries {
         status => 'ok',
         entries => $entries,
     });
-    # $c->render_json({
-    #     status => 'ok',
-    #     entries => $entries,
-    # });
 }
 
 sub sync {
     my ($class, $c) = @_;
     my $client_name = $c->req->param('client_name');
 
-    my $json = JSON->new->decode($c->req->param('entries') || '{}');
-    my $client_entries = $json->{entries};
+    my $json = JSON->new->decode($c->req->param('entry') || '{}');
+    my $client_entry = $json->{entry};
 
-    my @created_entries;
-    my @conflicted_entries;
-    my @client_uuids = map { $_->{uuid} } @$client_entries;
+    my $created_entry;
+    my $conflicted_entry;
     my $now = DateTime->now;
     my $update_count;
-    my ($sql, @bind) = sql_interp(q{SELECT * FROM entry WHERE uuid IN}, \@client_uuids);
-    my $server_entries = $c->dbh->selectall_arrayref(
-        $sql,
-        {
-            Slice => {}
-        },
-        @bind,
+    my $server_entry = $c->dbh->selectrow_hashref(
+        q{select * from entry where uuid = ?},
+        {},
+        $client_entry->{uuid},
     );
-    my %server_entries_map = map { $_->{uuid} => $_ } @$server_entries;
+
     warn 'start';
     { 
         my $txn = $c->dbh->txn_scope;
@@ -96,12 +88,9 @@ sub sync {
             q{SELECT max(usn) as update_count FROM entry},
             {},
         );
-        $update_count = $update_count_row->{update_count};
-        for my $client_entry (@$client_entries) {
-            
+        $update_count = $update_count_row->{update_count};            
             all { defined $client_entry->{$_} }qw/body uuid usn/ or return $c->create_response(400, [], "parameter missing");
             
-            my $server_entry = $server_entries_map{$client_entry->{uuid}};
             if ($server_entry) {
                 warn 'server usn ' . $server_entry->{usn};
                 warn 'client usn ' . $client_entry->{usn};
@@ -127,13 +116,13 @@ sub sync {
                         {},
                         $client_entry->{uuid},
                     );
-                    push @created_entries, $updated_entry;
+                    $created_entry = $updated_entry;
                 }
                 elsif ($server_entry->{usn} > $client_entry->{usn}) {
                     ## conflict
                     warn 'conflict!!!!';
                     if ($server_entry->{body} ne $client_entry->{body}) {
-                        push @conflicted_entries, +{
+                        $conflicted_entry = +{
                             client => $client_entry,
                             server => $server_entry,
                         };
@@ -153,15 +142,12 @@ sub sync {
                     uuid       => $client_entry->{uuid},
                     usn        => ++$update_count,
                 });
-                my $created_entry = $c->dbh->selectrow_hashref(
+                $created_entry = $c->dbh->selectrow_hashref(
                     q{select * from entry where uuid = ?},
-                    {
-                    },
+                    {},
                     $client_entry->{uuid},
                 );
-                push @created_entries, $created_entry;
             }
-        }
 
         $c->dbh->do_i(
             q{REPLACE INTO full_sync_before} => {
@@ -172,13 +158,15 @@ sub sync {
 
         $txn->commit;
     }
-    $c->render_json({
-        status => @conflicted_entries ? 'conflicted' :  'ok',
-        entries => \@created_entries || [],
-        conflicted_entries => \@conflicted_entries || [],
+    my $res = $c->render_json({
+        status => $conflicted_entry ? 'conflicted' :  'ok',
+        entry => $created_entry || undef,
+        conflicted_entries => $conflicted_entry || undef,
         server_current_time => $now->epoch,
         server_update_count => $update_count || 0,
     });
+    $res->status(409) if $conflicted_entry; ## conflict
+    $res;
 };
 
 1;

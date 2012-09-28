@@ -57,8 +57,7 @@ sub sync {
             conflicted_entries   => \@conflicted_entries,
             type                 => 'full sync',
         });
-    }
-    elsif (defined $full_sync_before && defined $last_sync_time && $full_sync_before == $last_sync_time) {
+    } elsif (defined $full_sync_before && defined $last_sync_time && $full_sync_before == $last_sync_time) {
         my $client_entries = $c->dbh->selectall_arrayref(
             q{SELECT * FROM entry WHERE dirty = 1},
             {
@@ -77,10 +76,9 @@ sub sync {
             conflicted_entries   => $conflicted_entries,
             type                 => 'send changes',
         });
-    }
-    else {
-        warn 'Incremental Sync';
-        ## incremental sync
+    } else {
+        warn 'Incremental sync';
+        ## Sync sync
         my %res = $class->_sync(
             $c,
             after_usn => $last_update_count,
@@ -130,7 +128,6 @@ sub _sync {
 
     my %server_uuids_map = map { $_->{uuid} => $_ } @$server_entries;
     my %client_uuids_map = map { $_->{uuid} => $_ } @$client_entries;
-
     my @will_save_entries = grep { !$client_uuids_map{$_->{uuid}} } @$server_entries;
     my @client_only_entries = grep { !$server_uuids_map{$_->{uuid}} } @$client_entries;
         
@@ -149,16 +146,14 @@ sub _sync {
             } else {
                 ## now syncing
             }
-        }
-        elsif ($server_entry->{usn} > $client_entry->{usn}) {
-            if ($client_entry->{dirty})  {
+        } elsif ($server_entry->{usn} > $client_entry->{usn}) {
+            if ($client_entry->{dirty} && $server_entry->{body} ne $client_entry->{body}) {
                 ## conflict
                 push @conflicted_entries, +{
                     client => $client_entry,
                     server => $server_entry,
                 };
-            }
-            else {
+            } else {
                 push @will_save_entries, $server_entry;
             }
         }
@@ -167,6 +162,7 @@ sub _sync {
     {
         my $txn = $c->dbh->txn_scope;
         for my $entry (@will_save_entries) {
+            warn 'save' .  $entry->{uuid};
             if ($client_uuids_map{$entry->{uuid}}) {
                 $c->dbh->do_i(
                     q{UPDATE entry SET} => +{
@@ -209,27 +205,28 @@ sub _send_changes {
     my $will_sync_entries = $args{will_sync_entries};
     my $last_update_count = $args{last_update_count};
 
-
-    ## send changes
-    my $txn = $c->dbh->txn_scope;
-
-    my $ua = LWP::UserAgent->new;
-
-    my $res = $ua->post("http://$server_host/server/api/sync", [
-        entries => JSON->new->encode({entries => $will_sync_entries }),
-        #            csrf_token => $c->get_csrf_defender_token,
-    ]);
-#    return if $res->code != 200;
-
-    my $json = decode_json($res->content || '{}');
-    my $server_current_time = DateTime->from_epoch(epoch => $json->{server_current_time});
-    my $server_update_count = $json->{server_update_count};
-    my $server_entries = $json->{entries};
-
-    my @conflicted_entries = @{$json->{conflicted_entries} || []};
+    my @conflicted_entries;
     my @synchronized_entries;
+    ## send changes
+
+     
+    my $ua = LWP::UserAgent->new;
+    for my $will_sync_entry (@$will_sync_entries) {
+        my $txn = $c->dbh->txn_scope;
+        my $res = $ua->post("http://$server_host/server/api/sync", [
+            entry => JSON->new->encode({entry => $will_sync_entry }),
+            #            csrf_token => $c->get_csrf_defender_token,
+        ]);
+        #    return if $res->code != 200;
+
+        my $json = decode_json($res->content || '{}');
+        my $server_current_time = DateTime->from_epoch(epoch => $json->{server_current_time});
+        my $server_update_count = $json->{server_update_count};
+        my $server_entry = $json->{entry};
+        if ($res->code == 409) {
+            push @conflicted_entries, $json->{conflicted_entry};
+        }
     
-    for my $server_entry (@$server_entries) {
         if ($server_entry->{usn} == $last_update_count + 1) {
             ## last_update_countを更新する
 
@@ -255,15 +252,15 @@ sub _send_changes {
             $server_entry->{uuid},
         );
         push @synchronized_entries, $synchronized_entry;
+
+        $c->dbh->do_i(q{REPLACE INTO client_status}, +{
+            client_name => $c->config->{client_name},
+            last_update_count =>  $server_update_count,
+            last_sync_time    =>  DateTime::Format::MySQL->format_datetime($server_current_time),
+        });
+
+        $txn->commit;
     }
-    $c->dbh->do_i(q{REPLACE INTO client_status}, +{
-        client_name => $c->config->{client_name},
-        last_update_count =>  $server_update_count,
-        last_sync_time    =>  DateTime::Format::MySQL->format_datetime($server_current_time),
-    });
-
-    $txn->commit;
-
     (
         conflicted_entries => \@conflicted_entries,
         synchronized_entries    => \@synchronized_entries,
